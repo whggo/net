@@ -11,7 +11,7 @@ on:
 env:
   REGISTRY: docker.io
   SOURCE_IMAGE: vevc/fml
-  TARGET_IMAGE: your-dockerhub-username/your-image-name # 修改为您的镜像名称
+  TARGET_IMAGE: whggo/aaaa # 修改为您的镜像名称
 
 jobs:
   build-and-push:
