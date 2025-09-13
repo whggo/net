@@ -3,22 +3,16 @@ name: Build and Push Docker Image
 on:
   push:
     branches: [ main, master ]
-    tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch: # 允许手动触发
 
 env:
   REGISTRY: docker.io
   SOURCE_IMAGE: vevc/fml
-  TARGET_IMAGE: whggo/aaaa # 修改为您的镜像名称
+  TARGET_IMAGE: whggo/aaaa # 修改为您的实际镜像名称
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
       - name: Checkout repository
@@ -33,25 +27,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.TARGET_IMAGE }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha
-
-      - name: Build and push Docker image
+      - name: Build and push Docker image with latest tag only
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          push: true
+          tags: ${{ env.TARGET_IMAGE }}:latest
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.created=${{ github.event.head_commit.timestamp }}
           cache-from: type=registry,ref=${{ env.SOURCE_IMAGE }}
           cache-to: type=inline,mode=max
+
+      - name: Verify push success
+        run: |
+          echo "Successfully pushed ${{ env.TARGET_IMAGE }}:latest to Docker Hub"
