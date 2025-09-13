@@ -1,11 +1,7 @@
-# 使用源镜像作为基础
+# 直接从源镜像构建
 FROM vevc/fml:latest
 
-# 可选：添加自定义配置或文件
-# COPY your-custom-file /path/in/container/
-
-# 可选：设置维护者信息
-LABEL maintainer="Your Name <your.email@example.com>"
-
-# 可选：添加其他元数据
-LABEL description="My customized version of vevc/fml image"
+# 可选：添加元数据
+LABEL maintainer="yang"
+LABEL version="1.0"
+LABEL description="Customized fml image"
